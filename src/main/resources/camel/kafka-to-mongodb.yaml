@@ -1,0 +1,87 @@
+- route:
+    id: kafka-cdc-to-mongodb
+    description: "Sincroniza eventos CDC de SQL Server a MongoDB"
+    from:
+      uri: "kafka:{{app.kafka.topic}}"
+      steps:
+        # Log del mensaje recibido
+        - log:
+            message: "Evento CDC recibido del tópico {{app.kafka.topic}}"
+            loggingLevel: DEBUG
+            
+        # Convertir el mensaje JSON string a Map
+        - unmarshal:
+            json:
+              library: jackson
+              unmarshalType: java.util.Map
+              
+        # Filtrar mensajes válidos (no tombstones)
+        - filter:
+            simple: "${body[payload]} != null"
+            steps:
+              # Extraer el payload del evento Debezium
+              - setProperty:
+                  name: cdcPayload
+                  simple: "${body[payload]}"
+                  
+              # Extraer la operación
+              - setProperty:
+                  name: cdcOperation
+                  simple: "${body[payload][op]}"
+                  
+              # Log de la operación
+              - log:
+                  message: "Procesando operación: ${exchangeProperty.cdcOperation} para ID: ${body[payload][after][id]}"
+                  
+              # Procesar según el tipo de operación
+              - choice:
+                  when:
+                    # INSERT (create)
+                    - simple: "${exchangeProperty.cdcOperation} == 'c'"
+                      steps:
+                        - process:
+                            ref: "cdcInsertProcessor"
+                        - to:
+                            uri: "mongodb:mongoClient?database={{app.mongodb.database}}&collection={{app.mongodb.collection}}&operation=insert"
+                        - log:
+                            message: "Documento insertado en MongoDB: ${body}"
+                            
+                    # UPDATE
+                    - simple: "${exchangeProperty.cdcOperation} == 'u'"
+                      steps:
+                        - process:
+                            ref: "cdcUpdateProcessor"
+                        - to:
+                            uri: "mongodb:mongoClient?database={{app.mongodb.database}}&collection={{app.mongodb.collection}}&operation=save"
+                        - log:
+                            message: "Documento actualizado en MongoDB: ${body}"
+                            
+                    # DELETE
+                    - simple: "${exchangeProperty.cdcOperation} == 'd'"
+                      steps:
+                        - process:
+                            ref: "cdcDeleteProcessor"
+                        - to:
+                            uri: "mongodb:mongoClient?database={{app.mongodb.database}}&collection={{app.mongodb.collection}}&operation=remove"
+                        - log:
+                            message: "Documento eliminado de MongoDB con ID: ${exchangeProperty.deletedId}"
+
+                            
+                  otherwise:
+                    steps:
+                      - log:
+                          message: "Operación desconocida: ${exchangeProperty.cdcOperation}"
+                          loggingLevel: WARN
+
+- route:
+    id: error-handler
+    description: "Manejo de errores para el procesamiento CDC"
+    from:
+      uri: "direct:error-handler"
+      steps:
+        - log:
+            message: "Error procesando evento CDC: ${exception.message}"
+            loggingLevel: ERROR
+        - log:
+            message: "Mensaje fallido: ${body}"
+            loggingLevel: ERROR
