@@ -6,7 +6,6 @@ import org.bson.Document;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
-import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;

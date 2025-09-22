@@ -1,0 +1,17 @@
+# Service para exponer Kafdrop dentro del cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafdrop-service
+  namespace: cdc-monitoring  # Cambiarlo si usas otro namespace
+  labels:
+    app: kafdrop
+spec:
+  type: ClusterIP  # ClusterIP para acceso interno, NodePort si necesitas acceso externo
+  selector:
+    app: kafdrop
+  ports:
+  - name: http
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
