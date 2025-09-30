@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kafdrop-config
-  namespace: cdc-monitoring
-data:
-  kafka.brokers: "my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
-  kafdrop.args: "--consumer.properties.auto.offset.reset=earliest --consumer.properties.max.poll.records=100"
