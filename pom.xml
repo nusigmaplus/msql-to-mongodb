@@ -6,15 +6,30 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
+        <!-- Configuracion del compilador -->
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
         <maven.compiler.release>17</maven.compiler.release>
+        
+        <!-- Codificacion del proyecto -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <!-- Configuracion de Javadoc - desactiva validacion estricta -->
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <additionalOptions>-Xdoclint:none</additionalOptions>
+        
+        <!-- Plataforma Quarkus -->
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>com.redhat.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.20.1.SP1-redhat-00001</quarkus.platform.version>
+        
+        <!-- Configuracion de testing -->
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
+        
+        <!-- Configuracion de Docker multi-plataforma -->
+        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
     </properties>
 
     <dependencyManagement>
