@@ -25,7 +25,7 @@
         
         <!-- Configuracion de testing -->
         <skipITs>true</skipITs>
-        <surefire-plugin.version>3.5.2</surefire-plugin.version>
+        <surefire-plugin.version>3.5.4</surefire-plugin.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         
         <!-- Configuracion de Docker multi-plataforma -->
