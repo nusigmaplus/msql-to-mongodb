@@ -7,7 +7,7 @@
 
     <properties>
         <!-- Configuracion del compilador -->
-        <compiler-plugin.version>3.14.0</compiler-plugin.version>
+        <compiler-plugin.version>3.15.0</compiler-plugin.version>
         <maven.compiler.release>17</maven.compiler.release>
         
         <!-- Codificacion del proyecto -->
